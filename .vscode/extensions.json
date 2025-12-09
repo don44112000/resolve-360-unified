@@ -1,0 +1,15 @@
+{
+    "recommendations": [
+        "dbaeumer.vscode-eslint",
+        "esbenp.prettier-vscode",
+        "firsttris.vscode-jest-runner",
+        "ms-azuretools.vscode-docker",
+        "PKief.material-icon-theme",
+        "mikestead.dotenv",
+        "christian-kohler.path-intellisense",
+        "usernamehw.errorlens",
+        "streetsidesoftware.code-spell-checker",
+        "waderyan.gitblame",
+        "eamodio.gitlens"
+    ]
+}

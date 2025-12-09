@@ -1,0 +1,21 @@
+{
+    "apps": [
+        {
+            "name": "resolve-360-unified-dev",
+            "script": "dist/main.js",
+            "instances": 1,
+            "exec_mode": "fork",
+            "env": {
+                "NODE_ENV": "dev"
+            },
+            "node_args": "--experimental-modules --es-module-specifier-resolution=node",
+            "autorestart": true,
+            "watch": false,
+            "time": true,
+            "error_file": "./logs/dev-error.log",
+            "out_file": "./logs/dev-out.log",
+            "log_date_format": "YYYY-MM-DD HH:mm:ss Z",
+            "merge_logs": true
+        }
+    ]
+}

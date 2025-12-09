@@ -1,0 +1,21 @@
+{
+    "apps": [
+        {
+            "name": "resolve-360-unified-qa",
+            "script": "dist/main.js",
+            "instances": 1,
+            "exec_mode": "fork",
+            "env": {
+                "NODE_ENV": "qa"
+            },
+            "node_args": "--experimental-modules --es-module-specifier-resolution=node",
+            "autorestart": true,
+            "watch": false,
+            "time": true,
+            "error_file": "./logs/qa-error.log",
+            "out_file": "./logs/qa-out.log",
+            "log_date_format": "YYYY-MM-DD HH:mm:ss Z",
+            "merge_logs": true
+        }
+    ]
+}

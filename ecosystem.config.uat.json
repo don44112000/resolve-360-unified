@@ -1,0 +1,21 @@
+{
+    "apps": [
+        {
+            "name": "resolve-360-unified-uat",
+            "script": "dist/main.js",
+            "instances": 1,
+            "exec_mode": "fork",
+            "env": {
+                "NODE_ENV": "uat"
+            },
+            "node_args": "--experimental-modules --es-module-specifier-resolution=node",
+            "autorestart": true,
+            "watch": false,
+            "time": true,
+            "error_file": "./logs/uat-error.log",
+            "out_file": "./logs/uat-out.log",
+            "log_date_format": "YYYY-MM-DD HH:mm:ss Z",
+            "merge_logs": true
+        }
+    ]
+}

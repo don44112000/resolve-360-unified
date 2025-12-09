@@ -1,0 +1,74 @@
+{
+    "version": "0.2.0",
+    "configurations": [
+        {
+            "type": "node",
+            "request": "launch",
+            "name": "Dev",
+            "runtimeArgs": [
+                "-r",
+                "ts-node/register",
+                "-r",
+                "tsconfig-paths/register"
+            ],
+            "args": [
+                "${workspaceFolder}/src/main.ts"
+            ],
+            "env": {
+                "NODE_ENV": "dev"
+            },
+            "envFile": "${workspaceFolder}/.env.dev",
+            "sourceMaps": true,
+            "cwd": "${workspaceFolder}",
+            "console": "integratedTerminal",
+            "protocol": "inspector",
+            "outputCapture": "std"
+        },
+        {
+            "type": "node",
+            "request": "launch",
+            "name": "QA",
+            "runtimeArgs": [
+                "-r",
+                "ts-node/register",
+                "-r",
+                "tsconfig-paths/register"
+            ],
+            "args": [
+                "${workspaceFolder}/src/main.ts"
+            ],
+            "env": {
+                "NODE_ENV": "qa"
+            },
+            "envFile": "${workspaceFolder}/.env.qa",
+            "sourceMaps": true,
+            "cwd": "${workspaceFolder}",
+            "console": "integratedTerminal",
+            "protocol": "inspector",
+            "outputCapture": "std"
+        },
+        {
+            "type": "node",
+            "request": "launch",
+            "name": "Prod",
+            "runtimeArgs": [
+                "-r",
+                "ts-node/register",
+                "-r",
+                "tsconfig-paths/register"
+            ],
+            "args": [
+                "${workspaceFolder}/src/main.ts"
+            ],
+            "env": {
+                "NODE_ENV": "prod"
+            },
+            "envFile": "${workspaceFolder}/.env.prod",
+            "sourceMaps": true,
+            "cwd": "${workspaceFolder}",
+            "console": "integratedTerminal",
+            "protocol": "inspector",
+            "outputCapture": "std"
+        }
+    ]
+}
