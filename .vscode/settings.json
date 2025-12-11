@@ -29,5 +29,5 @@
   "[javascript]": {
     "editor.defaultFormatter": "esbenp.prettier-vscode"
   },
-  "cSpell.words": ["dtos"]
+  "cSpell.words": ["aivencloud", "avnadmin", "AVNS", "defaultdb", "dtos", "pgadmin"]
 }
