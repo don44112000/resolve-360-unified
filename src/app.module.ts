@@ -18,6 +18,7 @@ import { BaseModule } from './modules/base/base.module';
 import { CommonModule } from './modules/common/common.module';
 import { AuthorizationModule } from './modules/authorization/authorization.module';
 import { CustomersModule } from './modules/customers/customers.module';
+import { BrandsModule } from './modules/brands/brands.module';
 import { SharedModule } from './shared/shared.module';
 
 // Guards and Interceptors
@@ -70,6 +71,7 @@ import { ErrorHandlerService } from './shared/services/errorHandler.service';
     CommonModule,
     AuthorizationModule,
     CustomersModule,
+    BrandsModule,
     SharedModule,
   ],
   controllers: [AppController],

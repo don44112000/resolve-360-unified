@@ -1,0 +1,103 @@
+import { Controller, Post, Get, Put, Delete, Body, Param, HttpStatus, Res } from '@nestjs/common';
+import { ApiTags } from '@nestjs/swagger';
+import { BrandsService } from '../services/brands.service';
+import { createBrandDTO } from '../dtos/requestDTO';
+
+@ApiTags('Brands')
+@Controller('brands')
+export class BrandsController {
+  constructor(private readonly brandsService: BrandsService) {}
+
+  @Post('create-brand')
+  async createBrand(@Body() body: createBrandDTO, @Res() res) {
+    try {
+      const result = await this.brandsService.createBrandWithTransaction(body);
+      return res.status(HttpStatus.CREATED).json({
+        success: true,
+        message: 'Brand created successfully',
+        data: result,
+      });
+    } catch (error) {
+      return res.status(HttpStatus.INTERNAL_SERVER_ERROR).json({
+        message: 'Failed to create brand',
+        error: error.message,
+        success: false,
+      });
+    }
+  }
+
+  @Get('all')
+  async getAllBrands(@Res() res) {
+    try {
+      const brands = await this.brandsService.findAllBrands();
+      return res.status(HttpStatus.OK).json({
+        success: true,
+        message: 'Brands retrieved successfully',
+        data: brands,
+      });
+    } catch (error) {
+      return res.status(HttpStatus.INTERNAL_SERVER_ERROR).json({
+        message: 'Failed to retrieve brands',
+        error: error.message,
+        success: false,
+      });
+    }
+  }
+
+  @Get('brandRefId/:brandRefId')
+  async getBrandByRefId(@Param('brandRefId') brandRefId: string, @Res() res) {
+    try {
+      const brand = await this.brandsService.findBrandByRefId(brandRefId);
+      return res.status(HttpStatus.OK).json({
+        success: true,
+        message: 'Brand retrieved successfully',
+        data: brand,
+      });
+    } catch (error) {
+      return res.status(HttpStatus.INTERNAL_SERVER_ERROR).json({
+        message: 'Failed to retrieve brand',
+        error: error.message,
+        success: false,
+      });
+    }
+  }
+
+  @Put('brandRefId/:brandRefId')
+  async updateBrand(
+    @Param('brandRefId') brandRefId: string,
+    @Body() body: createBrandDTO,
+    @Res() res,
+  ) {
+    try {
+      const result = await this.brandsService.updateBrandWithTransaction(brandRefId, body);
+      return res.status(HttpStatus.OK).json({
+        success: true,
+        message: 'Brand updated successfully',
+        data: result,
+      });
+    } catch (error) {
+      return res.status(HttpStatus.INTERNAL_SERVER_ERROR).json({
+        message: 'Failed to update brand',
+        error: error.message,
+        success: false,
+      });
+    }
+  }
+
+  @Delete('brandRefId/:brandRefId')
+  async deleteBrand(@Param('brandRefId') brandRefId: string, @Res() res) {
+    try {
+      await this.brandsService.deleteBrand(brandRefId);
+      return res.status(HttpStatus.OK).json({
+        success: true,
+        message: 'Brand deleted successfully',
+      });
+    } catch (error) {
+      return res.status(HttpStatus.INTERNAL_SERVER_ERROR).json({
+        message: 'Failed to delete brand',
+        error: error.message,
+        success: false,
+      });
+    }
+  }
+}
