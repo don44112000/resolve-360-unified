@@ -29,5 +29,17 @@
   "[javascript]": {
     "editor.defaultFormatter": "esbenp.prettier-vscode"
   },
-  "cSpell.words": ["aivencloud", "avnadmin", "AVNS", "defaultdb", "dtos", "pgadmin"]
+  "cSpell.words": [
+    "aivencloud",
+    "avnadmin",
+    "AVNS",
+    "defaultdb",
+    "dtos",
+    "msword",
+    "officedocument",
+    "openxmlformats",
+    "pgadmin",
+    "quicktime",
+    "wordprocessingml"
+  ]
 }
