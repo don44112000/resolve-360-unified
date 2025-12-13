@@ -19,6 +19,8 @@ import { CommonModule } from './modules/common/common.module';
 import { AuthorizationModule } from './modules/authorization/authorization.module';
 import { CustomersModule } from './modules/customers/customers.module';
 import { BrandsModule } from './modules/brands/brands.module';
+import { PostsModule } from './modules/posts/posts.module';
+import { PostAttachmentsModule } from './modules/post-attachments/post-attachments.module';
 import { SharedModule } from './shared/shared.module';
 
 // Guards and Interceptors
@@ -72,6 +74,8 @@ import { ErrorHandlerService } from './shared/services/errorHandler.service';
     AuthorizationModule,
     CustomersModule,
     BrandsModule,
+    PostsModule,
+    PostAttachmentsModule,
     SharedModule,
   ],
   controllers: [AppController],

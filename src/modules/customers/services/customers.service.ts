@@ -101,6 +101,17 @@ export class CustomersService {
     }
   }
 
+  async findCustomerByRefId(refId: string, transactionManager?: EntityManager): Promise<Customer> {
+    try {
+      const manager = transactionManager || this.dataSource.manager;
+      const customer = await manager.findOne(Customer, { where: { refId } });
+      return customer;
+    } catch (error) {
+      this.logger.error('Error finding customer by refId:', error);
+      throw error;
+    }
+  }
+
   async createCustomerWithTransaction(body: createCustomerDTO): Promise<any> {
     const queryRunner = this.dataSource.createQueryRunner();
     await queryRunner.connect();

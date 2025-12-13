@@ -64,8 +64,8 @@ export class PostAttachment {
   @Column({ name: 'is_public', type: 'boolean', default: true })
   isPublic: boolean;
 
-  @Column({ name: 'is_active', type: 'boolean', default: true })
-  isActive: boolean;
+  @Column({ name: 'is_deleted', type: 'boolean', default: false })
+  isDeleted: boolean;
 
   @Column({ type: 'jsonb', nullable: true })
   meta: Record<string, any> | null;
