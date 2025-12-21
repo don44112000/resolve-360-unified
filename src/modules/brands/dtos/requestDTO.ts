@@ -1,4 +1,5 @@
-import { IsString, IsEmail, IsOptional, MaxLength } from 'class-validator';
+import { ApiProperty } from '@nestjs/swagger';
+import { IsString, IsEmail, IsOptional, MaxLength, IsNotEmpty, IsNumber } from 'class-validator';
 
 export class createBrandDTO {
   @IsOptional()
@@ -18,7 +19,6 @@ export class createBrandDTO {
 
   @IsOptional()
   @IsString()
-  @MaxLength(255)
   primaryDomain?: string;
 
   @IsOptional()
@@ -38,9 +38,37 @@ export class createBrandDTO {
 
   @IsOptional()
   @IsString()
-  @MaxLength(500)
   logoUrl?: string;
 
   @IsOptional()
   contactMeta?: Record<string, any>;
+}
+
+export class createBrandByUserDTO {
+  @ApiProperty({ required: true })
+  @IsNotEmpty()
+  @IsString()
+  @MaxLength(255)
+  displayName: string;
+
+  @ApiProperty({ required: true })
+  @IsNotEmpty()
+  @IsString()
+  primaryDomain: string;
+}
+
+export class SearchBrandDTO {
+  @ApiProperty({ required: true })
+  @IsString()
+  searchKey: string;
+
+  @ApiProperty({ required: false, default: 25 })
+  @IsNumber()
+  @IsOptional()
+  limit?: number;
+
+  @ApiProperty({ required: false, default: 1 })
+  @IsNumber()
+  @IsOptional()
+  page?: number;
 }

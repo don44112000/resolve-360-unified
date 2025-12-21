@@ -1,7 +1,7 @@
 import { Controller, Post, Get, Put, Delete, Body, Param, HttpStatus, Res } from '@nestjs/common';
 import { ApiTags } from '@nestjs/swagger';
 import { BrandsService } from '../services/brands.service';
-import { createBrandDTO } from '../dtos/requestDTO';
+import { createBrandByUserDTO, createBrandDTO, SearchBrandDTO } from '../dtos/requestDTO';
 
 @ApiTags('Brands')
 @Controller('brands')
@@ -95,6 +95,38 @@ export class BrandsController {
     } catch (error) {
       return res.status(HttpStatus.INTERNAL_SERVER_ERROR).json({
         message: 'Failed to delete brand',
+        error: error.message,
+        success: false,
+      });
+    }
+  }
+
+  @Post('quick-create-brand')
+  async createBrandByUser(@Body() body: createBrandByUserDTO, @Res() res) {
+    try {
+      const result = await this.brandsService.quickCreateBrandWithTransaction(body);
+      return res.status(HttpStatus.CREATED).json({
+        success: true,
+        message: 'Brand created successfully',
+        data: result,
+      });
+    } catch (error) {
+      return res.status(HttpStatus.INTERNAL_SERVER_ERROR).json({
+        message: 'Failed to create brand',
+        error: error.message,
+        success: false,
+      });
+    }
+  }
+
+  @Post('key-search')
+  async searchBrands(@Body() body: SearchBrandDTO, @Res() res) {
+    try {
+      const result = await this.brandsService.searchBrandsBySearchKey(body);
+      return res.status(HttpStatus.OK).json(result);
+    } catch (error) {
+      return res.status(HttpStatus.INTERNAL_SERVER_ERROR).json({
+        message: 'Failed to search brands',
         error: error.message,
         success: false,
       });

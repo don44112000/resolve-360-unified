@@ -6,11 +6,12 @@ import { PostsController } from './controllers/posts.controller';
 import { CustomersModule } from '../customers/customers.module';
 import { BrandsModule } from '../brands/brands.module';
 import { PostAttachmentsModule } from '../post-attachments/post-attachments.module';
+import { PostsQueryRepository } from './repositories/posts.queries';
 
 @Module({
   imports: [TypeOrmModule.forFeature([Post]), CustomersModule, BrandsModule, PostAttachmentsModule],
   controllers: [PostsController],
-  providers: [PostsService],
+  providers: [PostsService, PostsQueryRepository],
   exports: [PostsService],
 })
 export class PostsModule {}

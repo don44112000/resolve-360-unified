@@ -2,7 +2,7 @@ import { Injectable, Logger, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository, EntityManager, DataSource } from 'typeorm';
 import { Brand } from '../../../entities/Brands/brand.entity';
-import { createBrandDTO } from '../dtos/requestDTO';
+import { createBrandDTO, createBrandByUserDTO, SearchBrandDTO } from '../dtos/requestDTO';
 import { BrandStatus } from '../../../shared/enums/common.enum';
 const DEFAULT_LOGO_URL = 'https://i.ibb.co/whgTBNsN/golden-logo-template-free-png.webp';
 
@@ -18,6 +18,7 @@ export class BrandsService {
     this.logger.log('BrandsService initialized');
   }
 
+  //USED BY INTERNAL TEAM TO REGISTER THE BRAND
   async createBrand(body: createBrandDTO, transactionManager?: EntityManager): Promise<Brand> {
     try {
       const manager = transactionManager || this.dataSource.manager;
@@ -31,6 +32,28 @@ export class BrandsService {
         primaryPhone: body.primaryPhone,
         logoUrl: DEFAULT_LOGO_URL, // body.logoUrl,
         contactMeta: body.contactMeta,
+        isVerified: true,
+        status: BrandStatus.ACTIVE,
+      });
+      const savedBrand = await manager.save(Brand, brand);
+      this.logger.log(`Brand created successfully with ID: ${savedBrand.id}`);
+      return savedBrand;
+    } catch (error) {
+      this.logger.error('Error creating brand:', error);
+      throw error;
+    }
+  }
+
+  //USED BY CUSTOMER TO QUICK REGISTER THE BRAND
+  async quickCreateBrand(
+    body: createBrandByUserDTO,
+    transactionManager?: EntityManager,
+  ): Promise<Brand> {
+    try {
+      const manager = transactionManager || this.dataSource.manager;
+      const brand = manager.create(Brand, {
+        displayName: body.displayName,
+        primaryDomain: body.primaryDomain,
         isVerified: false,
         status: BrandStatus.ACTIVE,
       });
@@ -122,6 +145,75 @@ export class BrandsService {
     await queryRunner.startTransaction();
     try {
       const result = await this.createBrand(body, queryRunner.manager);
+      await queryRunner.commitTransaction();
+      return result.refId;
+    } catch (error) {
+      await queryRunner.rollbackTransaction();
+      throw error;
+    } finally {
+      await queryRunner.release();
+    }
+  }
+
+  async searchBrandsBySearchKey(body: SearchBrandDTO): Promise<any> {
+    try {
+      // Set defaults
+      const { searchKey, limit = 25, page = 1 } = body;
+
+      const queryBuilder = this.brandRepository
+        .createQueryBuilder('brand')
+        .select(['brand.refId', 'brand.displayName', 'brand.logoUrl']); // Only fetch needed fields
+
+      // Search in legalName, displayName, and shortName
+      if (searchKey && searchKey.trim()) {
+        queryBuilder.where(
+          `(
+            brand.legal_name ILIKE :searchKey OR
+            brand.display_name ILIKE :searchKey OR
+            brand.short_name ILIKE :searchKey
+          )`,
+          { searchKey: `%${searchKey.trim()}%` },
+        );
+      }
+
+      // Single query with pagination - no count query
+      const brands = await queryBuilder
+        .skip((page - 1) * limit)
+        .take(limit)
+        .getMany();
+
+      // Check if empty after fetching
+      if (brands.length === 0) {
+        return {
+          message: 'No brands found matching the search criteria',
+          data: { items: [] },
+          success: true,
+        };
+      }
+
+      const transformedData = brands.map((brand) => ({
+        refId: brand.refId,
+        displayName: brand.displayName,
+        logoUrl: brand.logoUrl,
+      }));
+
+      return {
+        message: `Found ${transformedData.length} brand(s) matching the search criteria`,
+        data: { items: transformedData },
+        success: true,
+      };
+    } catch (error) {
+      this.logger.error('Error searching brands:', error);
+      throw error;
+    }
+  }
+
+  async quickCreateBrandWithTransaction(body: createBrandByUserDTO): Promise<any> {
+    const queryRunner = this.dataSource.createQueryRunner();
+    await queryRunner.connect();
+    await queryRunner.startTransaction();
+    try {
+      const result = await this.quickCreateBrand(body, queryRunner.manager);
       await queryRunner.commitTransaction();
       return result.refId;
     } catch (error) {

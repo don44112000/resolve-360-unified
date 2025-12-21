@@ -7,6 +7,7 @@ import { CustomersService } from '../../customers/services/customers.service';
 import { BrandsService } from '../../brands/services/brands.service';
 import { PostAttachmentsService } from '../../post-attachments/services/post-attachments.service';
 import { PostStatus, PostPriority } from '../../../shared/enums/common.enum';
+import { PostsQueryRepository } from '../repositories/posts.queries';
 
 @Injectable()
 export class PostsService {
@@ -19,6 +20,7 @@ export class PostsService {
     private readonly brandsService: BrandsService,
     private readonly postAttachmentsService: PostAttachmentsService,
     private readonly dataSource: DataSource,
+    private readonly postsQueryRepository: PostsQueryRepository,
   ) {
     this.logger.log('PostsService initialized');
   }
@@ -113,6 +115,27 @@ export class PostsService {
       return postsWithDetails;
     } catch (error) {
       this.logger.error('Error fetching posts:', error);
+      throw error;
+    }
+  }
+
+  async getAllPostsV2(transactionManager?: EntityManager): Promise<any[]> {
+    try {
+      const manager = transactionManager || this.dataSource.manager;
+
+      // Get the raw SQL query
+      const rawQuery = this.postsQueryRepository.getAllPostsRawQuery();
+
+      // Execute the raw query
+      const results = await manager.query(rawQuery);
+
+      // Extract the post objects from the results
+      const postsWithDetails = results.map((row: any) => row.post);
+
+      this.logger.log(`Fetched ${postsWithDetails.length} posts using raw SQL`);
+      return postsWithDetails;
+    } catch (error) {
+      this.logger.error('Error fetching posts with raw SQL:', error);
       throw error;
     }
   }

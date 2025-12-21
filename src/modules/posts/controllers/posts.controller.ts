@@ -28,7 +28,7 @@ export class PostsController {
   @Get('all-posts')
   async getAllPosts(@Res() res: Response) {
     try {
-      const posts = await this.postsService.getAllPosts();
+      const posts = await this.postsService.getAllPostsV2();
       return res.status(HttpStatus.OK).json({
         success: true,
         message: 'Posts fetched successfully',
