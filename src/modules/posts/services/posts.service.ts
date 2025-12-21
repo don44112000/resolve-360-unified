@@ -27,8 +27,7 @@ export class PostsService {
     try {
       const manager = transactionManager || this.dataSource.manager;
 
-      // Create the post entity using repository
-      const post = this.postRepository.create({
+      const post = manager.create(Post, {
         customerId: body.customerId,
         brandId: body.brandId,
         title: body.title,
@@ -41,12 +40,79 @@ export class PostsService {
         meta: body.meta || null,
       });
 
-      // Save using manager
       const savedPost = await manager.save(post);
       this.logger.log(`Post created successfully with ID: ${savedPost.id}`);
       return savedPost;
     } catch (error) {
       this.logger.error('Error creating post:', error);
+      throw error;
+    }
+  }
+
+  async getAllPosts(transactionManager?: EntityManager): Promise<any[]> {
+    try {
+      const manager = transactionManager || this.dataSource.manager;
+
+      // Fetch all posts with their attachments, customer, and brand details using query builder
+      const posts = await manager
+        .getRepository(Post)
+        .createQueryBuilder('post')
+        .leftJoinAndSelect(
+          'post_attachments',
+          'attachment',
+          'attachment.post_id = post.id AND attachment.is_deleted = false',
+        )
+        .leftJoin('customers', 'customer', 'customer.id = post.customer_id')
+        .leftJoin('brands', 'brand', 'brand.id = post.brand_id')
+        .addSelect(['customer.name', 'brand.display_name', 'brand.logo_url'])
+        .orderBy('post.created_at', 'DESC')
+        .getRawAndEntities();
+
+      // Map the results to include attachments and details
+      const postsWithDetails = posts.entities.map((post) => {
+        // Find the corresponding raw data for this post
+        const postRaw = posts.raw.find((raw) => raw.post_id === post.id);
+
+        // Get all attachments for this post
+        const attachments = posts.raw
+          .filter((raw) => raw.post_id === post.id && raw.attachment_id)
+          .map((raw) => ({
+            id: raw.attachment_id,
+            refId: raw.attachment_ref_id,
+            fileUrl: raw.attachment_file_url,
+            fileName: raw.attachment_file_name,
+            fileType: raw.attachment_file_type,
+            isPublic: raw.attachment_is_public,
+            createdAt: raw.attachment_created_at,
+          }));
+
+        return {
+          id: post.id,
+          refId: post.refId,
+          title: post.title,
+          description: post.description,
+          status: post.status,
+          priority: post.priority,
+          isPublic: post.isPublic,
+          isVerified: post.isVerified,
+          isEdited: post.isEdited,
+          meta: post.meta,
+          createdAt: post.createdAt,
+          customerDetails: {
+            name: postRaw?.customer_name || null,
+          },
+          brandDetails: {
+            name: postRaw?.display_name || null,
+            logoUrl: postRaw?.logo_url || null,
+          },
+          attachments,
+        };
+      });
+
+      this.logger.log(`Fetched ${postsWithDetails.length} posts`);
+      return postsWithDetails;
+    } catch (error) {
+      this.logger.error('Error fetching posts:', error);
       throw error;
     }
   }
