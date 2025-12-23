@@ -30,6 +30,9 @@ RUN npm install --legacy-peer-deps --production
 # Copy built application from builder stage
 COPY --from=builder /app/dist ./dist
 
+# Copy SQL files (needed for raw queries)
+COPY --from=builder /app/src ./src
+
 # Create non-root user for security
 RUN addgroup -g 1001 -S nodejs && \
     adduser -S nestjs -u 1001
