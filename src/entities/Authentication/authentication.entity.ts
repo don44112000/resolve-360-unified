@@ -6,10 +6,9 @@ import {
   UpdateDateColumn,
   BeforeUpdate,
 } from 'typeorm';
-import { AccessLevel } from '../../shared/enums/common.enum';
 
-@Entity('authorizations')
-export class Authorization {
+@Entity('authentication')
+export class Authentication {
   @PrimaryGeneratedColumn('increment', { type: 'bigint' })
   id: string;
 
@@ -27,14 +26,6 @@ export class Authorization {
 
   @Column({ type: 'varchar', length: 20, nullable: true })
   otp: string | null;
-
-  @Column({
-    name: 'access_level',
-    type: 'varchar',
-    length: 50,
-    nullable: false,
-  })
-  accessLevel: AccessLevel;
 
   @CreateDateColumn({
     name: 'created_at',

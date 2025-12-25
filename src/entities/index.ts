@@ -3,7 +3,7 @@
  * Import all entities here to be auto-loaded by TypeORM
  */
 
-export { Authorization } from './Authorizations/authorization.entity';
+export { Authentication } from './Authentication/authentication.entity';
 export { Brand } from './Brands/brand.entity';
 export { BrandUser } from './BrandUsers/brand-user.entity';
 export { Customer } from './Customers/customer.entity';

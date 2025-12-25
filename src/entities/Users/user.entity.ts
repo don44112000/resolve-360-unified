@@ -9,7 +9,7 @@ import {
   Index,
   BeforeUpdate,
 } from 'typeorm';
-import { Authorization } from '../Authorizations/authorization.entity';
+import { Authentication } from '../Authentication/authentication.entity';
 import { UserRole } from '../../shared/enums/common.enum';
 
 @Entity('users')
@@ -28,9 +28,9 @@ export class User {
   @Column({ name: 'auth_id', type: 'bigint', nullable: true })
   authId: string | null;
 
-  @ManyToOne(() => Authorization, { onDelete: 'SET NULL', nullable: true })
+  @ManyToOne(() => Authentication, { onDelete: 'SET NULL', nullable: true })
   @JoinColumn({ name: 'auth_id' })
-  authorization: Authorization | null;
+  authorization: Authentication | null;
 
   @Column({
     name: 'ref_id',

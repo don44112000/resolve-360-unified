@@ -3,8 +3,7 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Repository, EntityManager, DataSource } from 'typeorm';
 import { Customer } from '../../../entities/Customers/customer.entity';
 import { createCustomerDTO, customerPasswordLoginDTO } from '../dtos/requestDTO';
-import { AuthorizationService } from '../../authorization/services/authorization.service';
-import { AccessLevel } from '../../../shared/enums/common.enum';
+import { AuthenticationService } from '../../authentication/services/authentication.service';
 
 @Injectable()
 export class CustomersService {
@@ -13,7 +12,7 @@ export class CustomersService {
   constructor(
     @InjectRepository(Customer)
     private readonly customerRepository: Repository<Customer>,
-    private readonly authorizationService: AuthorizationService,
+    private readonly authenticationService: AuthenticationService,
     private readonly dataSource: DataSource,
   ) {
     this.logger.log('CustomersService initialized');
@@ -28,9 +27,8 @@ export class CustomersService {
       const authPayload = {
         password: body.password,
         otp: '6666',
-        accessLevel: AccessLevel.CUSTOMER,
       };
-      const saveAuth = await this.authorizationService.createAuthorization(authPayload, manager);
+      const saveAuth = await this.authenticationService.createAuthentication(authPayload, manager);
       const customer = manager.create(Customer, {
         authId: saveAuth.id,
         name: body.name,
@@ -138,9 +136,9 @@ export class CustomersService {
       if (!customer) {
         throw new Error('Customer not found');
       }
-      const auth = await this.authorizationService.getAuthorizationById(customer.authId);
+      const auth = await this.authenticationService.getAuthenticationById(customer.authId);
       if (!auth) {
-        throw new Error('Authorization not found');
+        throw new Error('Authentication not found');
       }
       if (auth.password !== body.password) {
         throw new Error('Invalid password');

@@ -16,7 +16,7 @@ import { HttpConfigService } from './config/HttpConfig.service';
 // Modules
 import { BaseModule } from './modules/base/base.module';
 import { CommonModule } from './modules/common/common.module';
-import { AuthorizationModule } from './modules/authorization/authorization.module';
+import { AuthenticationModule } from './modules/authentication/authentication.module';
 import { CustomersModule } from './modules/customers/customers.module';
 import { BrandsModule } from './modules/brands/brands.module';
 import { PostsModule } from './modules/posts/posts.module';
@@ -71,7 +71,7 @@ import { ErrorHandlerService } from './shared/services/errorHandler.service';
     // Feature Modules
     BaseModule,
     CommonModule,
-    AuthorizationModule,
+    AuthenticationModule,
     CustomersModule,
     BrandsModule,
     PostsModule,

@@ -33,17 +33,6 @@ export enum Environment {
 }
 
 /**
- * Access level enumeration for authorization
- */
-export enum AccessLevel {
-  ADMIN = 'admin',
-  CUSTOMER = 'customer',
-  AGENT = 'agent',
-  MODERATOR = 'moderator',
-  INTERNAL = 'internal',
-}
-
-/**
  * User role enumeration
  */
 export enum UserRole {
