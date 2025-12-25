@@ -36,9 +36,6 @@ export class BrandUser {
   @Column({ type: 'varchar', length: 50, nullable: false })
   role: BrandUserRole;
 
-  @Column({ name: 'is_primary', type: 'boolean', default: false })
-  isPrimary: boolean;
-
   @Column({ name: 'is_active', type: 'boolean', default: true })
   isActive: boolean;
 
