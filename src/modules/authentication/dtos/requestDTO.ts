@@ -1,4 +1,4 @@
-import { IsString, IsOptional } from 'class-validator';
+import { IsString, IsOptional, IsDate, IsBoolean } from 'class-validator';
 
 export class RequestDTO {
   @IsOptional()
@@ -8,4 +8,16 @@ export class RequestDTO {
   @IsOptional()
   @IsString()
   otp?: string;
+
+  @IsOptional()
+  @IsString()
+  refreshTokenHash?: string;
+
+  @IsOptional()
+  @IsDate()
+  refreshTokenExpiresAt?: Date;
+
+  @IsOptional()
+  @IsBoolean()
+  refreshTokenRevoked?: boolean;
 }

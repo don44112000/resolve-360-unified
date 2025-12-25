@@ -30,10 +30,20 @@ export class CustomersController {
   async customerPasswordLogin(@Body() body: customerPasswordLoginDTO, @Res() res) {
     try {
       const customer = await this.customersService.customerPasswordLogin(body);
+
+      // Set refresh token as HTTP-only cookie
+      res.cookie('refreshToken', customer.refreshToken, {
+        httpOnly: true, // Prevent JavaScript access
+        secure: process.env.NODE_ENV === 'production', // HTTPS only in production
+        sameSite: 'strict', // CSRF protection
+        maxAge: 14 * 24 * 60 * 60 * 1000, // 14 days in milliseconds
+      });
+
+      // Return only customer data and access token in JSON
       return res.status(HttpStatus.OK).json({
         success: true,
         message: 'Customer logged in successfully',
-        data: customer,
+        data: customer.data,
       });
     } catch (error) {
       return res.status(HttpStatus.INTERNAL_SERVER_ERROR).json({

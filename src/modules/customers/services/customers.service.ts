@@ -4,6 +4,8 @@ import { Repository, EntityManager, DataSource } from 'typeorm';
 import { Customer } from '../../../entities/Customers/customer.entity';
 import { createCustomerDTO, customerPasswordLoginDTO } from '../dtos/requestDTO';
 import { AuthenticationService } from '../../authentication/services/authentication.service';
+import { JwtService } from '../../../shared/services/jwt.service';
+import { ITokenPair } from '../../../shared/interfaces/common.interface';
 
 @Injectable()
 export class CustomersService {
@@ -14,6 +16,7 @@ export class CustomersService {
     private readonly customerRepository: Repository<Customer>,
     private readonly authenticationService: AuthenticationService,
     private readonly dataSource: DataSource,
+    private readonly jwtService: JwtService,
   ) {
     this.logger.log('CustomersService initialized');
   }
@@ -143,12 +146,39 @@ export class CustomersService {
       if (auth.password !== body.password) {
         throw new Error('Invalid password');
       }
+
+      // Generate JWT access token (15 min)
+      const accessToken = this.jwtService.generateAccessToken(customer.refId);
+
+      // Generate opaque refresh token (random string)
+      const refreshToken = this.jwtService.generateOpaqueRefreshToken();
+
+      // Hash refresh token for database storage
+      const refreshTokenHash = this.jwtService.hashRefreshToken(refreshToken);
+
+      // Get expiration date (14 days from now)
+      const expiresAt = this.jwtService.getRefreshTokenExpiration();
+
+      // Store hashed refresh token in database
+      await this.authenticationService.storeRefreshToken(
+        customer.authId,
+        refreshTokenHash,
+        expiresAt,
+      );
+
+      this.logger.log(`Customer logged in successfully: ${customer.refId}`);
+
+      // Return customer data, access token (JSON), and refresh token (for cookie)
       return {
-        refId: customer.refId,
-        name: customer.name,
-        email: customer.email,
-        phone: customer.phone,
-        countryCode: customer.countryCode,
+        data: {
+          refId: customer.refId,
+          name: customer.name,
+          email: customer.email,
+          phone: customer.phone,
+          countryCode: customer.countryCode,
+          accessToken,
+        },
+        refreshToken,
       };
     } catch (error) {
       this.logger.error('Error logging in customer:', error);

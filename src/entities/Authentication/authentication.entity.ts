@@ -5,7 +5,10 @@ import {
   CreateDateColumn,
   UpdateDateColumn,
   BeforeUpdate,
+  OneToOne,
 } from 'typeorm';
+import { Customer } from '../Customers/customer.entity';
+import { User } from '../Users/user.entity';
 
 @Entity('authentication')
 export class Authentication {
@@ -27,6 +30,27 @@ export class Authentication {
   @Column({ type: 'varchar', length: 20, nullable: true })
   otp: string | null;
 
+  @Column({
+    name: 'refresh_token_hash',
+    type: 'text',
+    nullable: true,
+  })
+  refreshTokenHash: string | null;
+
+  @Column({
+    name: 'refresh_token_expires_at',
+    type: 'timestamp with time zone',
+    nullable: true,
+  })
+  refreshTokenExpiresAt: Date | null;
+
+  @Column({
+    name: 'refresh_token_revoked',
+    type: 'boolean',
+    default: false,
+  })
+  refreshTokenRevoked: boolean;
+
   @CreateDateColumn({
     name: 'created_at',
     type: 'timestamp with time zone',
@@ -40,6 +64,13 @@ export class Authentication {
     default: () => 'NOW()',
   })
   updatedAt: Date;
+
+  // Relationships
+  @OneToOne(() => Customer, (customer) => customer.authorization)
+  customer: Customer;
+
+  @OneToOne(() => User, (user) => user.authorization)
+  user: User;
 
   @BeforeUpdate()
   updateTimestamp() {
