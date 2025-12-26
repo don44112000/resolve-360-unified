@@ -1,7 +1,6 @@
 import axios from 'axios';
-import * as jwt from 'jsonwebtoken';
 
-const SERVICE_ID = 'resolve-360-unified'; // This will be replaced with actual service ID later
+const SERVICE_NAME = 'unified-service';
 
 /**
  * External config service integration
@@ -10,72 +9,63 @@ const SERVICE_ID = 'resolve-360-unified'; // This will be replaced with actual s
  */
 
 interface ConfigServiceResponse {
-    data: Record<string, any>;
+  [key: string]: any;
 }
 
 /**
  * Load environment variables from external config service
- * This function authenticates with the config service and fetches environment-specific configuration
- * 
+ * This function authenticates with the config service using API key and fetches environment-specific configuration
+ *
  * @returns Object containing all configuration values
  */
 export const loadEnvFromConfigService = async (): Promise<Record<string, any>> => {
-    const nodeEnv = process.env.NODE_ENV || 'dev';
-    const configServiceBaseURL = process.env.CONFIG_SERVICE_URL || 'http://config-service:3000';
+  const nodeEnv = process.env.NODE_ENV;
+  const configServiceBaseURL = process.env.CONFIG_SERVICE_URL;
+  const configServiceApiKey = process.env.CONFIG_SERVICE_API_KEY;
+  if (!nodeEnv || !configServiceBaseURL || !configServiceApiKey) {
+    console.warn(
+      '[Config] NODE_ENV, CONFIG_SERVICE_URL, CONFIG_SERVICE_API_KEY not set, falling back to local environment variables',
+    );
+    return process.env;
+  }
 
-    console.log(`[Config] Loading configuration for environment: ${nodeEnv}`);
+  console.log(`[Config] Loading configuration for environment: ${nodeEnv}`);
 
-    // For local development, skip external config service
-    if (nodeEnv === 'dev' || nodeEnv === 'development') {
-        console.log('[Config] Using local .env file for development');
-        return process.env;
+  try {
+    // Fetch configuration from external service
+    // Endpoint: GET /config/:serviceName/:envName
+    const configEndpoint = `${configServiceBaseURL}/config/${SERVICE_NAME}/${nodeEnv}`;
+
+    console.log(`[Config] Fetching configuration from: ${configEndpoint}`);
+
+    const response = await axios.get<ConfigServiceResponse>(configEndpoint, {
+      headers: {
+        'x-api-key': configServiceApiKey,
+      },
+      timeout: 10000,
+    });
+
+    if (!response.data) {
+      throw new Error('Invalid response from config service');
     }
 
-    try {
-        // Step 1: Generate JWT token for authentication with config service
-        const configServiceSecret = process.env.CONFIG_SERVICE_JWT_SECRET || 'default_secret';
-        const token = jwt.sign(
-            {
-                serviceId: SERVICE_ID,
-                environment: nodeEnv,
-                timestamp: Date.now(),
-            },
-            configServiceSecret,
-            { expiresIn: '5m' }
-        );
+    const configData = response.data;
 
-        // Step 2: Fetch configuration from external service
-        const configEndpoint = `${configServiceBaseURL}/api/config/${SERVICE_ID}/${nodeEnv}`;
+    // Set all configuration to process.env
+    Object.keys(configData).forEach((key) => {
+      process.env[key] = String(configData[key]);
+    });
 
-        console.log(`[Config] Fetching configuration from: ${configEndpoint}`);
+    console.log(
+      `[Config] Successfully loaded ${Object.keys(configData).length} configuration values`,
+    );
 
-        const response = await axios.get<ConfigServiceResponse>(configEndpoint, {
-            headers: {
-                Authorization: `Bearer ${token}`,
-            },
-            timeout: 10000,
-        });
+    return configData;
+  } catch (error) {
+    console.error('[Config] Error loading configuration from external service:', error.message);
+    console.log('[Config] Falling back to local environment variables');
 
-        if (!response.data || !response.data.data) {
-            throw new Error('Invalid response from config service');
-        }
-
-        const configData = response.data.data;
-
-        // Step 3: Set all configuration to process.env
-        Object.keys(configData).forEach((key) => {
-            process.env[key] = configData[key];
-        });
-
-        console.log(`[Config] Successfully loaded ${Object.keys(configData).length} configuration values`);
-
-        return configData;
-
-    } catch (error) {
-        console.error('[Config] Error loading configuration from external service:', error.message);
-        console.log('[Config] Falling back to local environment variables');
-
-        // Fallback to local environment variables
-        return process.env;
-    }
+    // Fallback to local environment variables
+    return process.env;
+  }
 };
