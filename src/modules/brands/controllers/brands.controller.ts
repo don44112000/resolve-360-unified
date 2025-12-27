@@ -1,7 +1,7 @@
 import { Controller, Post, Get, Put, Delete, Body, Param, HttpStatus, Res } from '@nestjs/common';
 import { ApiTags } from '@nestjs/swagger';
 import { BrandsService } from '../services/brands.service';
-import { createBrandByUserDTO, createBrandDTO, SearchBrandDTO } from '../dtos/requestDTO';
+import { CreateBrandByUserDTO, CreateBrandDTO, SearchBrandDTO } from '../dtos/requestDTO';
 
 @ApiTags('Brands')
 @Controller('brands')
@@ -9,7 +9,7 @@ export class BrandsController {
   constructor(private readonly brandsService: BrandsService) {}
 
   @Post('create-brand')
-  async createBrand(@Body() body: createBrandDTO, @Res() res) {
+  async createBrand(@Body() body: CreateBrandDTO, @Res() res) {
     try {
       const result = await this.brandsService.createBrandWithTransaction(body);
       return res.status(HttpStatus.CREATED).json({
@@ -65,7 +65,7 @@ export class BrandsController {
   @Put('brandRefId/:brandRefId')
   async updateBrand(
     @Param('brandRefId') brandRefId: string,
-    @Body() body: createBrandDTO,
+    @Body() body: CreateBrandDTO,
     @Res() res,
   ) {
     try {
@@ -102,7 +102,7 @@ export class BrandsController {
   }
 
   @Post('quick-create-brand')
-  async createBrandByUser(@Body() body: createBrandByUserDTO, @Res() res) {
+  async createBrandByUser(@Body() body: CreateBrandByUserDTO, @Res() res) {
     try {
       const result = await this.brandsService.quickCreateBrandWithTransaction(body);
       return res.status(HttpStatus.CREATED).json({

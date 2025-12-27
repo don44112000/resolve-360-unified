@@ -2,7 +2,7 @@ import { Injectable, Logger } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository, EntityManager, DataSource, MoreThan } from 'typeorm';
 import { Authentication } from '../../../entities/Authentication/authentication.entity';
-import { RequestDTO } from '../dtos/requestDTO';
+import { AuthenticationRequestDTO } from '../dtos/requestDTO';
 import { Customer, User } from 'src/entities';
 
 /**
@@ -22,7 +22,7 @@ export class AuthenticationService {
   }
 
   async createAuthentication(
-    body: RequestDTO,
+    body: AuthenticationRequestDTO,
     transactionManager?: EntityManager,
   ): Promise<Authentication> {
     try {

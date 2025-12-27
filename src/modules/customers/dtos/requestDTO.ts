@@ -1,7 +1,9 @@
 import { IsString, IsEmail, IsOptional, MaxLength, IsNotEmpty, ValidateIf } from 'class-validator';
+import { ApiProperty } from '@nestjs/swagger';
 
-export class phoneEmailDTO {
+export class PhoneEmailDTO {
   // Email is required if phone/countryCode are not provided
+  @ApiProperty({ required: false })
   @ValidateIf((o) => !o.phone || !o.countryCode)
   @IsNotEmpty({ message: 'email is required when phone and countryCode are not provided' })
   @IsEmail()
@@ -9,6 +11,7 @@ export class phoneEmailDTO {
   email?: string;
 
   // CountryCode is required if phone is provided OR if email is not provided
+  @ApiProperty({ required: false })
   @ValidateIf((o) => o.phone && !o.email)
   @IsNotEmpty({
     message: 'countryCode is required when phone is provided or when email is not provided',
@@ -18,6 +21,7 @@ export class phoneEmailDTO {
   countryCode?: string;
 
   // Phone is required if countryCode is provided OR if email is not provided
+  @ApiProperty({ required: false })
   @ValidateIf((o) => o.countryCode && !o.email)
   @IsNotEmpty({
     message: 'phone is required when countryCode is provided or when email is not provided',
@@ -26,18 +30,21 @@ export class phoneEmailDTO {
   @MaxLength(20)
   phone?: string;
 }
-export class createCustomerDTO extends phoneEmailDTO {
-  @IsOptional()
+export class CreateCustomerDTO extends PhoneEmailDTO {
+  @ApiProperty({ required: true })
+  @IsNotEmpty()
   @IsString()
   @MaxLength(150)
-  name?: string;
+  name: string;
 
-  @IsOptional()
+  @ApiProperty({ required: true })
+  @IsNotEmpty()
   @IsString()
   @MaxLength(255)
-  password?: string;
+  password: string;
 }
-export class customerPasswordLoginDTO extends phoneEmailDTO {
+export class CustomerPasswordLoginDTO extends PhoneEmailDTO {
+  @ApiProperty({ required: true })
   @IsNotEmpty()
   @IsString()
   @MaxLength(255)

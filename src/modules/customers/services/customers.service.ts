@@ -2,7 +2,7 @@ import { Injectable, Logger } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository, EntityManager, DataSource } from 'typeorm';
 import { Customer } from '../../../entities/Customers/customer.entity';
-import { createCustomerDTO, customerPasswordLoginDTO } from '../dtos/requestDTO';
+import { CreateCustomerDTO, CustomerPasswordLoginDTO } from '../dtos/requestDTO';
 import { AuthenticationService } from '../../authentication/services/authentication.service';
 import { JwtService } from '../../../shared/services/jwt.service';
 import { ITokenPair } from '../../../shared/interfaces/common.interface';
@@ -22,7 +22,7 @@ export class CustomersService {
   }
 
   async createCustomer(
-    body: createCustomerDTO,
+    body: CreateCustomerDTO,
     transactionManager?: EntityManager,
   ): Promise<Customer> {
     try {
@@ -113,7 +113,7 @@ export class CustomersService {
     }
   }
 
-  async createCustomerWithTransaction(body: createCustomerDTO): Promise<any> {
+  async createCustomerWithTransaction(body: CreateCustomerDTO): Promise<any> {
     const queryRunner = this.dataSource.createQueryRunner();
     await queryRunner.connect();
     await queryRunner.startTransaction();
@@ -129,7 +129,7 @@ export class CustomersService {
     }
   }
 
-  async customerPasswordLogin(body: customerPasswordLoginDTO): Promise<any> {
+  async customerPasswordLogin(body: CustomerPasswordLoginDTO): Promise<any> {
     try {
       const customer = await this.findCustomerByEmailOrPhone(
         body.email ?? null,

@@ -1,7 +1,7 @@
 import { Controller, Post, Body, HttpException, HttpStatus, Res } from '@nestjs/common';
 import { ApiTags } from '@nestjs/swagger';
 import { CustomersService } from '../services/customers.service';
-import { createCustomerDTO, customerPasswordLoginDTO } from '../dtos/requestDTO';
+import { CreateCustomerDTO, CustomerPasswordLoginDTO } from '../dtos/requestDTO';
 
 @ApiTags('Customers')
 @Controller('customers')
@@ -9,7 +9,7 @@ export class CustomersController {
   constructor(private readonly customersService: CustomersService) {}
 
   @Post('create-customer')
-  async createCustomer(@Body() body: createCustomerDTO, @Res() res) {
+  async createCustomer(@Body() body: CreateCustomerDTO, @Res() res) {
     try {
       const result = await this.customersService.createCustomerWithTransaction(body);
       return res.status(HttpStatus.CREATED).json({
@@ -27,7 +27,7 @@ export class CustomersController {
   }
 
   @Post('customer-password-login')
-  async customerPasswordLogin(@Body() body: customerPasswordLoginDTO, @Res() res) {
+  async customerPasswordLogin(@Body() body: CustomerPasswordLoginDTO, @Res() res) {
     try {
       const customer = await this.customersService.customerPasswordLogin(body);
 

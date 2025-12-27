@@ -2,9 +2,9 @@ import { Injectable, Logger, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository, EntityManager, DataSource } from 'typeorm';
 import { Brand } from '../../../entities/Brands/brand.entity';
-import { createBrandDTO, createBrandByUserDTO, SearchBrandDTO } from '../dtos/requestDTO';
+import { CreateBrandDTO, CreateBrandByUserDTO, SearchBrandDTO } from '../dtos/requestDTO';
 import { BrandStatus } from '../../../shared/enums/common.enum';
-const DEFAULT_LOGO_URL = 'https://i.ibb.co/whgTBNsN/golden-logo-template-free-png.webp';
+const DEFAULT_LOGO_URL = 'https://hilarious-nougat-bcb604.netlify.app/image.jpg';
 
 @Injectable()
 export class BrandsService {
@@ -19,7 +19,7 @@ export class BrandsService {
   }
 
   //USED BY INTERNAL TEAM TO REGISTER THE BRAND
-  async createBrand(body: createBrandDTO, transactionManager?: EntityManager): Promise<Brand> {
+  async createBrand(body: CreateBrandDTO, transactionManager?: EntityManager): Promise<Brand> {
     try {
       const manager = transactionManager || this.dataSource.manager;
       const brand = manager.create(Brand, {
@@ -46,7 +46,7 @@ export class BrandsService {
 
   //USED BY CUSTOMER TO QUICK REGISTER THE BRAND
   async quickCreateBrand(
-    body: createBrandByUserDTO,
+    body: CreateBrandByUserDTO,
     transactionManager?: EntityManager,
   ): Promise<Brand> {
     try {
@@ -101,7 +101,7 @@ export class BrandsService {
 
   async updateBrand(
     refId: string,
-    body: createBrandDTO,
+    body: CreateBrandDTO,
     transactionManager?: EntityManager,
   ): Promise<Brand> {
     try {
@@ -139,7 +139,7 @@ export class BrandsService {
     }
   }
 
-  async createBrandWithTransaction(body: createBrandDTO): Promise<any> {
+  async createBrandWithTransaction(body: CreateBrandDTO): Promise<any> {
     const queryRunner = this.dataSource.createQueryRunner();
     await queryRunner.connect();
     await queryRunner.startTransaction();
@@ -208,7 +208,7 @@ export class BrandsService {
     }
   }
 
-  async quickCreateBrandWithTransaction(body: createBrandByUserDTO): Promise<any> {
+  async quickCreateBrandWithTransaction(body: CreateBrandByUserDTO): Promise<any> {
     const queryRunner = this.dataSource.createQueryRunner();
     await queryRunner.connect();
     await queryRunner.startTransaction();
@@ -224,7 +224,7 @@ export class BrandsService {
     }
   }
 
-  async updateBrandWithTransaction(refId: string, body: createBrandDTO): Promise<any> {
+  async updateBrandWithTransaction(refId: string, body: CreateBrandDTO): Promise<any> {
     const queryRunner = this.dataSource.createQueryRunner();
     await queryRunner.connect();
     await queryRunner.startTransaction();

@@ -2,7 +2,7 @@ import { Injectable, Logger, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository, EntityManager, DataSource } from 'typeorm';
 import { Post } from '../../../entities/Posts/post.entity';
-import { createPostDTO, savePostDTO } from '../dtos/requestDTO';
+import { CreatePostDTO, SavePostDTO } from '../dtos/requestDTO';
 import { CustomersService } from '../../customers/services/customers.service';
 import { BrandsService } from '../../brands/services/brands.service';
 import { PostAttachmentsService } from '../../post-attachments/services/post-attachments.service';
@@ -25,7 +25,7 @@ export class PostsService {
     this.logger.log('PostsService initialized');
   }
 
-  async createPost(body: savePostDTO, transactionManager?: EntityManager): Promise<Post> {
+  async createPost(body: SavePostDTO, transactionManager?: EntityManager): Promise<Post> {
     try {
       const manager = transactionManager || this.dataSource.manager;
 
@@ -140,7 +140,7 @@ export class PostsService {
     }
   }
 
-  async createPostWithTransaction(body: createPostDTO): Promise<any> {
+  async createPostWithTransaction(body: CreatePostDTO): Promise<any> {
     const queryRunner = this.dataSource.createQueryRunner();
     await queryRunner.connect();
     await queryRunner.startTransaction();

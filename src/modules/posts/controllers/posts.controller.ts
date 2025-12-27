@@ -1,6 +1,6 @@
 import { Controller, Post, Body, HttpCode, HttpStatus, Res, Get } from '@nestjs/common';
 import { PostsService } from '../services/posts.service';
-import { createPostDTO } from '../dtos/requestDTO';
+import { CreatePostDTO } from '../dtos/requestDTO';
 import { Response } from 'express';
 
 @Controller('posts')
@@ -8,7 +8,7 @@ export class PostsController {
   constructor(private readonly postsService: PostsService) {}
 
   @Post('create-post')
-  async createPost(@Body() body: createPostDTO, @Res() res: Response) {
+  async createPost(@Body() body: CreatePostDTO, @Res() res: Response) {
     try {
       const refId = await this.postsService.createPostWithTransaction(body);
       return res.status(HttpStatus.CREATED).json({
