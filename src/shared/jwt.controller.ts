@@ -68,7 +68,7 @@ export class JwtController {
    * Logout endpoint
    * Handles cookie clearing
    */
-  @Post('logout')
+  @Post('customer-logout')
   @HttpCode(HttpStatus.OK)
   @ApiCookieAuth('refreshToken')
   @ApiOperation({
