@@ -215,7 +215,11 @@ export class BrandsService {
     try {
       const result = await this.quickCreateBrand(body, queryRunner.manager);
       await queryRunner.commitTransaction();
-      return result.refId;
+      return {
+        refId: result.refId,
+        displayName: result.displayName,
+        logoUrl: result.logoUrl ?? null,
+      };
     } catch (error) {
       await queryRunner.rollbackTransaction();
       throw error;
