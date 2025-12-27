@@ -7,9 +7,16 @@ import { CustomersModule } from '../customers/customers.module';
 import { BrandsModule } from '../brands/brands.module';
 import { PostAttachmentsModule } from '../post-attachments/post-attachments.module';
 import { PostsQueryRepository } from './repositories/posts.queries';
+import { SharedModule } from '../../shared/shared.module';
 
 @Module({
-  imports: [TypeOrmModule.forFeature([Post]), CustomersModule, BrandsModule, PostAttachmentsModule],
+  imports: [
+    TypeOrmModule.forFeature([Post]),
+    CustomersModule,
+    BrandsModule,
+    PostAttachmentsModule,
+    SharedModule,
+  ],
   controllers: [PostsController],
   providers: [PostsService, PostsQueryRepository],
   exports: [PostsService],

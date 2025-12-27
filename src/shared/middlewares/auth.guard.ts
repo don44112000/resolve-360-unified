@@ -29,9 +29,25 @@ export class AuthGuard implements CanActivate {
     const path = request.path || request.url;
 
     // Public routes that don't require authentication
-    const publicRoutes = ['/', '/health', '/readiness', '/liveness', '/api'];
+    // Note: '/api' is for Swagger UI docs, not all API routes
+    const publicRoutes = [
+      '/',
+      '/health',
+      '/readiness',
+      '/liveness',
+      // Authentication endpoints (must be public so users can login/signup)
+      '/customers/create-customer',
+      '/customers/customer-password-login',
+      '/JWT/refresh/customer-token',
+      '/JWT/customer-logout',
+    ];
 
-    if (publicRoutes.some((route) => path.startsWith(route))) {
+    // Allow Swagger documentation endpoints specifically
+    if (path === '/api' || path === '/api/' || path.startsWith('/api-json')) {
+      return true;
+    }
+
+    if (publicRoutes.some((route) => path === route)) {
       return true;
     }
 

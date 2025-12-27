@@ -1,7 +1,21 @@
-import { Controller, Post, Get, Put, Delete, Body, Param, HttpStatus, Res } from '@nestjs/common';
-import { ApiTags } from '@nestjs/swagger';
+import {
+  Controller,
+  Post,
+  Get,
+  Put,
+  Delete,
+  Body,
+  Param,
+  HttpStatus,
+  Res,
+  UseGuards,
+  Req,
+} from '@nestjs/common';
+import { ApiTags, ApiBearerAuth } from '@nestjs/swagger';
+import { Request } from 'express';
 import { BrandsService } from '../services/brands.service';
 import { CreateBrandByUserDTO, CreateBrandDTO, SearchBrandDTO } from '../dtos/requestDTO';
+import { AuthGuard } from '../../../shared/middlewares/auth.guard';
 
 @ApiTags('Brands')
 @Controller('brands')
@@ -102,8 +116,13 @@ export class BrandsController {
   }
 
   @Post('quick-create-brand')
-  async createBrandByUser(@Body() body: CreateBrandByUserDTO, @Res() res) {
+  @UseGuards(AuthGuard)
+  @ApiBearerAuth('JWT')
+  async createBrandByUser(@Body() body: CreateBrandByUserDTO, @Req() req: Request, @Res() res) {
     try {
+      // Access authenticated user info from JWT token
+      const authenticatedUser = (req as any).user; // IJwtPayload with userRefId
+
       const result = await this.brandsService.quickCreateBrandWithTransaction(body);
       return res.status(HttpStatus.CREATED).json({
         success: true,

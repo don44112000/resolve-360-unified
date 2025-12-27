@@ -1,15 +1,37 @@
-import { Controller, Post, Body, HttpCode, HttpStatus, Res, Get } from '@nestjs/common';
+import {
+  Controller,
+  Post,
+  Body,
+  HttpCode,
+  HttpStatus,
+  Res,
+  Get,
+  UseGuards,
+  Req,
+  HttpException,
+} from '@nestjs/common';
 import { PostsService } from '../services/posts.service';
 import { CreatePostDTO } from '../dtos/requestDTO';
-import { Response } from 'express';
+import { Request, Response } from 'express';
+import { AuthGuard } from '../../../shared/middlewares/auth.guard';
+import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
 
+@ApiTags('Posts')
 @Controller('posts')
 export class PostsController {
   constructor(private readonly postsService: PostsService) {}
 
   @Post('create-post')
-  async createPost(@Body() body: CreatePostDTO, @Res() res: Response) {
+  @UseGuards(AuthGuard)
+  @ApiBearerAuth('JWT')
+  async createPost(@Body() body: CreatePostDTO, @Req() req: Request, @Res() res: Response) {
     try {
+      // Access authenticated user info from JWT token
+      const authenticatedUser = (req as any).user; // IJwtPayload with userRefId
+      if (body.customerRefId !== authenticatedUser.userRefId) {
+        throw new HttpException('Customer Ref Id does not match', HttpStatus.BAD_REQUEST);
+      }
+
       const refId = await this.postsService.createPostWithTransaction(body);
       return res.status(HttpStatus.CREATED).json({
         success: true,

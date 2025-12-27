@@ -45,44 +45,56 @@ async function bootstrap() {
     }),
   );
 
-  // Swagger/OpenAPI documentation
-  const config = new DocumentBuilder()
-    .setTitle('Resolve 360 Unified API')
-    .setDescription('Production-ready NestJS microservice base repository')
-    .setVersion('1.0.0')
-    .addBearerAuth(
-      {
-        type: 'http',
-        scheme: 'bearer',
-        bearerFormat: 'JWT',
-        description: 'Enter JWT token',
-      },
-      'JWT',
-    )
-    .addApiKey(
-      {
-        type: 'apiKey',
-        name: 'x-api-key',
-        in: 'header',
-        description: 'API key for internal microservice communication',
-      },
-      'API-Key',
-    )
-    .addServer('http://localhost:3000', 'Local Development')
-    .addServer('https://dev-api.example.com', 'Development')
-    .addServer('https://qa-api.example.com', 'QA')
-    .addServer('https://uat-api.example.com', 'UAT')
-    .addServer('https://api.example.com', 'Production')
-    .build();
+  // Get port early so it can be used in Swagger docs
+  const port = process.env.PORT || 3000;
 
-  const document = SwaggerModule.createDocument(app, config);
-  SwaggerModule.setup('api', app, document);
+  // Swagger/OpenAPI documentation
+  // Only enable in non-production environments for security
+
+  const isDev = process.env.NODE_ENV === 'dev';
+
+  if (isDev) {
+    const config = new DocumentBuilder()
+      .setTitle('Resolve 360 Unified API')
+      .setDescription('Production-ready NestJS microservice base repository')
+      .setVersion('1.0.0')
+      .addBearerAuth(
+        {
+          type: 'http',
+          scheme: 'bearer',
+          bearerFormat: 'JWT',
+          description: 'Enter JWT token',
+        },
+        'JWT',
+      )
+      .addApiKey(
+        {
+          type: 'apiKey',
+          name: 'x-api-key',
+          in: 'header',
+          description: 'API key for internal microservice communication',
+        },
+        'API-Key',
+      )
+      .addServer('http://localhost:3000', 'Local Development')
+      .addServer('https://dev-api.example.com', 'Development')
+      .addServer('https://qa-api.example.com', 'QA')
+      .addServer('https://uat-api.example.com', 'UAT')
+      .addServer('https://api.example.com', 'Production')
+      .build();
+
+    const document = SwaggerModule.createDocument(app, config);
+    SwaggerModule.setup('api', app, document);
+
+    logger.log(`📚 Swagger documentation available at: http://localhost:${port}/api`);
+  } else {
+    logger.log(`🔒 Swagger documentation is disabled in production for security`);
+  }
 
   // Enable graceful shutdown
   app.enableShutdownHooks();
 
   // Start listening
-  const port = process.env.PORT || 3000;
   await app.listen(port);
 
   logger.log(`🚀 Application is running on: http://localhost:${port}`);
